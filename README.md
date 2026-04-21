@@ -1,64 +1,40 @@
-# n8n_project
-📸 EditPicture: Telegram to Google Drive Image Automation
-Dự án này là một n8n Workflow tự động hóa quy trình xử lý hậu kỳ hình ảnh. Hệ thống cho phép người dùng gửi ảnh qua Telegram, tự động xử lý tách nền bằng AI và lưu trữ tệp tin lên Google Drive với tên file được đặt động theo yêu cầu của người dùng.
+# 📸 EditPicture: Telegram to Google Drive Automation
 
-🚀 Tính năng chính
-Tiếp nhận dữ liệu đa phương tiện: Tự động lắng nghe và tải hình ảnh từ Telegram Bot.
+Dự án này là một hệ thống tự động hóa được xây dựng trên **n8n**, cho phép tiếp nhận hình ảnh từ Telegram, thực hiện tách nền bằng AI (qua API) và tự động lưu trữ vào Google Drive với tên file được đặt theo yêu cầu.
 
-Xử lý ảnh bằng AI: Tích hợp API chuyên dụng để xóa nền ảnh (Background Removal) một cách chính xác.
+## 🌟 Tính năng chính
+- **Nhận diện tự động:** Lắng nghe và tải ảnh kèm caption từ Telegram Bot.
+- **Xử lý hậu kỳ:** Tự động xóa nền ảnh (Background Removal) sử dụng API chuyên dụng.
+- **Lưu trữ đám mây:** Tự động đẩy tệp tin đã xử lý lên Google Drive.
+- **Định danh thông minh:** Tên file được đặt động dựa trên nội dung tin nhắn (`caption`) của người dùng.
 
-Quản lý lưu trữ thông minh: Tự động đẩy file lên Google Drive.
+## 🏗️ Cấu trúc Workflow
+Hệ thống bao gồm các node chính:
+1. **Telegram Trigger:** Tiếp nhận tin nhắn (Ảnh + Caption).
+2. **Get a File (Telegram Node):** Truy xuất và tải dữ liệu Binary của ảnh.
+3. **HTTP Request:** Gửi dữ liệu ảnh tới API xử lý (Remove.bg) và nhận lại ảnh đã xóa nền.
+4. **Google Drive Upload:** Lưu trữ ảnh vào thư mục chỉ định với tên file tương ứng.
 
-Đặt tên file động: Sử dụng nội dung caption của người dùng làm tên file để dễ dàng quản lý và tìm kiếm.
+## 🛠️ Yêu cầu hệ thống
+- **n8n** (Desktop hoặc Docker version).
+- **Telegram Bot Token** (Lấy từ @BotFather).
+- **Remove.bg API Key** (Đăng ký tại remove.bg).
+- **Google Drive OAuth2** (Cấu hình qua Google Cloud Console).
 
-🏗️ Cấu trúc Workflow
-Workflow bao gồm 4 giai đoạn chính:
+## 🚀 Hướng dẫn cài đặt
+1. Tải file `EditPicture.json` từ repository này.
+2. Trong giao diện n8n, chọn **Import from File** và tải file vừa tải lên.
+3. Cấu hình **Credentials** cho:
+   - Telegram API
+   - Header Auth (cho mã API của Remove.bg)
+   - Google Drive OAuth2
+4. Nhấn **Execute Workflow** và gửi ảnh từ Telegram để kiểm tra.
 
-Telegram Trigger: Nhận tin nhắn chứa hình ảnh và mô tả.
+## 📝 Giải quyết vấn đề (Troubleshooting)
+Trong quá trình thực hiện bài kiểm tra giữa kỳ, dự án đã được tối ưu hóa như sau:
+- **Lỗi Quota AI:** Chuyển đổi từ Gemini/OpenAI (thường xuyên lỗi hạn mức hoặc yêu cầu nạp tiền) sang sử dụng API xử lý chuyên dụng qua node **HTTP Request** để đảm bảo độ ổn định 100%.
+- **Xử lý Binary:** Cấu hình chính xác định dạng `multipart/form-data` để truyền tải ảnh nhị phân mà không bị hỏng tệp.
 
-Get a File: Truy xuất thông tin file_id và tải dữ liệu nhị phân (Binary) của ảnh từ máy chủ Telegram.
-
-HTTP Request (Xử lý AI): Kết nối với API (như Remove.bg) để thực hiện tác vụ xóa nền.
-
-Google Drive Upload: Lưu trữ kết quả cuối cùng vào thư mục đám mây.
-
-🛠️ Công nghệ sử dụng
-n8n: Nền tảng low-code để kết nối các dịch vụ.
-
-Telegram Bot API: Giao diện tương tác người dùng.
-
-Remove.bg API / HTTP Request: Xử lý hậu kỳ hình ảnh.
-
-Google Drive API: Lưu trữ dữ liệu.
-
-JavaScript (Expression): Xử lý logic đặt tên file và trích xuất dữ liệu.
-
-📝 Hướng dẫn cài đặt
-Chuẩn bị API Keys:
-
-Tạo Bot trên Telegram qua @BotFather để lấy API Token.
-
-Đăng ký tài khoản tại remove.bg để lấy API Key.
-
-Thiết lập Credentials cho Google Drive trên n8n.
-
-Import Workflow:
-
-Mở n8n, chọn Import from File.
-
-Chọn file EditPicture.json.
-
-Cấu hình Node:
-
-Cập nhật Credentials cho các node: Telegram, HTTP Request và Google Drive.
-
-Đảm bảo node HTTP Request đã được điền đúng API Key trong phần Header (X-Api-Key).
-
-💡 Giải quyết vấn đề (Problem Solving)
-Dự án này đã được tối ưu hóa từ các thử nghiệm ban đầu:
-
-Vượt qua rào cản hạn mức: Chuyển đổi từ Google Gemini (bị giới hạn Quota) sang API chuyên dụng qua HTTP Request để đảm bảo hệ thống luôn hoạt động ổn định.
-
-Xử lý Binary Data: Cấu hình chính xác luồng dữ liệu nhị phân để đảm bảo hình ảnh không bị hỏng trong quá trình truyền tải giữa các API.
-5. Kết quả đạt được
-Hệ thống cho phép người dùng chỉ cần gửi một tấm ảnh kèm tên gọi mong muốn, ngay lập tức họ sẽ có một tấm ảnh đã được tách nền chuyên nghiệp lưu trữ sẵn trên đám mây, giúp tối ưu hóa quy trình làm việc thủ công.
+## 👨‍💻 Tác giả
+- **Nguyễn Quốc Trọng**
+- Dự án: Bài kiểm tra giữa kỳ - Hệ thống hóa quy trình tự động.
