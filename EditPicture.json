@@ -1,0 +1,168 @@
+{
+  "name": "EditPicture",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "82c1e95c-d2d1-4b14-96f1-00f93992bfc5",
+      "name": "Telegram Trigger",
+      "webhookId": "5bf9168d-ec18-43cd-8eaa-2cc6d66c1f40",
+      "credentials": {
+        "telegramApi": {
+          "id": "hBBWGPhSI9fwmG0A",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo.reverse()[0].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fbae82f4-2da2-45c5-a327-7077b684d52c",
+      "name": "Get a file",
+      "webhookId": "cdb70974-ddbf-4992-9e99-95b175ce95e0",
+      "credentials": {
+        "telegramApi": {
+          "id": "hBBWGPhSI9fwmG0A",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $node[\"Telegram Trigger\"].json[\"message\"][\"caption\"] }}.png",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1gqTZulER_6PcXEKqD_uZZ3MBkTLVInx3",
+          "mode": "list",
+          "cachedResultName": "KiemTraGiuaKy",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1gqTZulER_6PcXEKqD_uZZ3MBkTLVInx3"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "daf24143-4b9d-47d0-b228-1825bced27d4",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "AFuwnGRknJnIubJV",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.remove.bg/v1.0/removebg",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image_file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "size",
+              "value": "auto"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "444b9dcc-1b29-4f34-9b63-1ec038f4d327",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "l0kiszaKq0aStqdb",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "55f97598-d34b-458c-8d96-5100a30a7650",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec184986ef83e80e2ff4c264a5ef33e47a86328c3274287afe1f680588061e17"
+  },
+  "id": "NOxmfRoqLeMvXjPC",
+  "tags": []
+}
